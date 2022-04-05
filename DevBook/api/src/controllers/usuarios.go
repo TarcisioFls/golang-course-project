@@ -8,7 +8,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 //CriarUsuario Criando o usuário
@@ -77,7 +80,35 @@ func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 
 //BuscarUsuário retonar um usuário
 func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Buscando um usuário"))
+
+	usuarioID, erro := strconv.ParseInt(mux.Vars(r)["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+
+		return
+	}
+
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeUsuario(db)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+
+		return
+	}
+
+	usuario, erro := repositorio.GetUsuario(usuarioID)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+	}
+	respostas.JSON(w, http.StatusOK, usuario)
 }
 
 //AtualizarUsuario Atualiza um usuário

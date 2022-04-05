@@ -81,3 +81,32 @@ func (repositorio usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error)
 
 	return usuarios, nil
 }
+
+//GetUsuario método para retornar o usuário que possuí o id passado como paramentro
+func (respositorio usuarios) GetUsuario(usuarioID int64) (modelos.Usuario, error) {
+	var usuario modelos.Usuario
+	linha, erro := respositorio.db.Query(`
+		SELECT id, nome, nick, email, criadoEm
+		FROM usuarios
+		where id = ?
+	`, usuarioID)
+	if erro != nil {
+		return usuario, erro
+	}
+
+	defer linha.Close()
+
+	if linha.Next() {
+		if erro = linha.Scan(
+			&usuario.ID,
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+			&usuario.CriadoEm,
+		); erro != nil {
+			return usuario, erro
+		}
+	}
+
+	return usuario, nil
+}
