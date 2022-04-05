@@ -83,12 +83,12 @@ func (repositorio usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error)
 }
 
 //GetUsuario método para retornar o usuário que possuí o id passado como paramentro
-func (respositorio usuarios) GetUsuario(usuarioID int64) (modelos.Usuario, error) {
+func (repositorio usuarios) GetUsuario(usuarioID int64) (modelos.Usuario, error) {
 	var usuario modelos.Usuario
-	linha, erro := respositorio.db.Query(`
+	linha, erro := repositorio.db.Query(`
 		SELECT id, nome, nick, email, criadoEm
 		FROM usuarios
-		where id = ?
+		WHERE id = ?
 	`, usuarioID)
 	if erro != nil {
 		return usuario, erro
@@ -109,4 +109,27 @@ func (respositorio usuarios) GetUsuario(usuarioID int64) (modelos.Usuario, error
 	}
 
 	return usuario, nil
+}
+
+//UpdateUsuario atualiza os dados do usuário informando
+func (repositorio usuarios) UpdateUsuario(usuarioID int64, usuario modelos.Usuario) error {
+
+	statement, erro := repositorio.db.Prepare(`
+		UPDATE usuarios set nome = ?, nick = ?, email = ? 
+		WHERE id = ?
+	`)
+	if erro != nil {
+
+		return erro
+	}
+
+	defer statement.Close()
+
+	if _, erro = statement.Exec(usuario.Nome, usuario.Nick, usuario.Email, usuarioID); erro != nil {
+
+		return erro
+	}
+
+	return nil
+
 }
