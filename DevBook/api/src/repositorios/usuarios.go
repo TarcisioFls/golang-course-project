@@ -133,3 +133,24 @@ func (repositorio usuarios) UpdateUsuario(usuarioID int64, usuario modelos.Usuar
 	return nil
 
 }
+
+//DeletarUsuario deleta as informações do usuário com o id informado
+func (repositorio usuarios) DeleteUsuario(usuarioID int64) error {
+
+	statement, erro := repositorio.db.Prepare(`
+		DELETE FROM usuarios WHERE id = ?
+	`)
+	if erro != nil {
+
+		return erro
+	}
+
+	defer statement.Close()
+
+	if _, erro = statement.Exec(usuarioID); erro != nil {
+		return erro
+	}
+
+	return nil
+
+}
