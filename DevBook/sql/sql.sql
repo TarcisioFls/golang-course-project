@@ -8,10 +8,9 @@ CREATE TABLE `usuarios` (
   `nome` varchar(50) NOT NULL,
   `nick` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `senha` varchar(20) NOT NULL,
+  `senha` varchar(100) NOT NULL,
   `criadoEm` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nick` (`nick`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `senha` (`senha`)
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
