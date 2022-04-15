@@ -112,7 +112,7 @@ func (repositorio usuarios) GetUsuario(usuarioID int64) (modelos.Usuario, error)
 }
 
 //UpdateUsuario atualiza os dados do usuário informando
-func (repositorio usuarios) UpdateUsuario(usuarioID int64, usuario modelos.Usuario) error {
+func (repositorio usuarios) UpdateUsuario(usuarioID uint64, usuario modelos.Usuario) error {
 
 	statement, erro := repositorio.db.Prepare(`
 		UPDATE usuarios set nome = ?, nick = ?, email = ? 
