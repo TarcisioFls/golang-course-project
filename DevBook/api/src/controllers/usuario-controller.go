@@ -130,7 +130,7 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if usuarioID != usuarioIDNoToken {
-		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível atualizar u usuário diferente do seu"))
+		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível atualizar um usuário diferente do seu"))
 		return
 	}
 
@@ -176,10 +176,21 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 //DeletarUsuário deletando um usuário
 func DeletarUsuario(w http.ResponseWriter, r *http.Request) {
 
-	usuarioID, erro := strconv.ParseInt(mux.Vars(r)["usuarioId"], 10, 64)
+	usuarioID, erro := strconv.ParseUint(mux.Vars(r)["usuarioId"], 10, 64)
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
 
+		return
+	}
+
+	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if usuarioID != usuarioIDNoToken {
+		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível deletar um usuário diferente do seu"))
 		return
 	}
 
