@@ -64,5 +64,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respostas.JSON(w, http.StatusAccepted, "Logado com o token:"+token)
+	respostas.JSON(w, http.StatusAccepted, token)
 }
