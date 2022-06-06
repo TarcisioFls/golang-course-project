@@ -1,9 +1,66 @@
 package controllers
 
-import "net/http"
+import (
+	"api/src/autenticacao"
+	"api/src/banco"
+	"api/src/modelos"
+	"api/src/repositorios"
+	"api/src/respostas"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
 
 //CriarPublicacao é responsável por salvar uma publicação no banco de dados
 func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
+
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+
+		return
+	}
+
+	var publicacao modelos.Publicacao
+	if erro = json.Unmarshal(corpoRequest, &publicacao); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+
+		return
+	}
+
+	defer db.Close()
+
+	publicacao.AutorId = usuarioId
+
+	if erro = publicacao.Preparar(); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+
+		return
+	}
+
+	repositorio := repositorios.NovoRepositorioDePublicacao(db)
+	publicacao.Id, erro = repositorio.Criar(publicacao)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+
+		return
+	}
+
+	respostas.JSON(w, http.StatusCreated, publicacao)
 
 }
 
