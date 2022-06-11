@@ -25,7 +25,7 @@ CREATE TABLE `seguidores` (
   PRIMARY KEY(`usuario_id`, `seguidor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
-CREATE TABLE `publicacao`(
+CREATE TABLE `publicacoes`(
   `id` int NOT NULL AUTO_INCREMENT,
   `titulo` varchar(50) NOT NULL,
   `conteudo` varchar(300) NOT NULL,
