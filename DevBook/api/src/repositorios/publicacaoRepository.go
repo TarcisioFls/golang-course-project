@@ -41,3 +41,34 @@ func (repositorio publicacoes) Criar(publicacao modelos.Publicacao) (uint64, err
 
 	return uint64(ultimoIdInserido), nil
 }
+
+//BuscarPorId retornar uma única publicação do banco de dados
+func (repositorio publicacoes) BuscarPorId(publicacaoId uint64) (modelos.Publicacao, error) {
+	var publicacao modelos.Publicacao
+	linha, erro := repositorio.db.Query(`
+		SELECT p.*, u.nick
+		FROM publicacao p INNER JOIN usuarios u ON p.autor_id = u.id
+		WHERE p.id = ?
+	`, publicacaoId)
+	if erro != nil {
+		return publicacao, erro
+	}
+
+	defer linha.Close()
+
+	if linha.Next() {
+		if erro = linha.Scan(
+			&publicacao.Id,
+			&publicacao.Titulo,
+			&publicacao.Conteudo,
+			&publicacao.AutorId,
+			&publicacao.Curtidas,
+			&publicacao.CriadaEm,
+			&publicacao.AutorNick,
+		); erro != nil {
+			return publicacao, erro
+		}
+	}
+
+	return publicacao, nil
+}
